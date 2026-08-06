@@ -46,7 +46,12 @@ class Version:
         return f"{self.major}.{self.minor}.{self.patch}{suffix}"
 
 
-def run(args: list[str], *, dry_run: bool = False, check: bool = True) -> subprocess.CompletedProcess[str]:
+def run(
+    args: list[str],
+    *,
+    dry_run: bool = False,
+    check: bool = True,
+) -> subprocess.CompletedProcess[str]:
     print("+ " + " ".join(args))
     if dry_run:
         return subprocess.CompletedProcess(args, 0, "", "")
@@ -131,16 +136,27 @@ def ensure_only_version_files_changed() -> None:
         abort("Unexpected changes after version update:\n\n" + "\n".join(unexpected))
 
 
-def commit_version(version: Version, message: str, *, dry_run: bool) -> None:
+def commit_version(message: str, *, dry_run: bool) -> None:
     ensure_only_version_files_changed()
-    run(["git", "add", str(PYPROJECT.relative_to(ROOT)), str(LOCKFILE.relative_to(ROOT))], dry_run=dry_run)
+    run(
+        ["git", "add", str(PYPROJECT.relative_to(ROOT)), str(LOCKFILE.relative_to(ROOT))],
+        dry_run=dry_run,
+    )
     run(["git", "commit", "-m", message], dry_run=dry_run)
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Release stitch-text from main.")
-    parser.add_argument("--remote", default="upstream", help="Git remote to push to. Default: upstream.")
-    parser.add_argument("--yes", action="store_true", help="Execute the release. Default is dry-run.")
+    parser.add_argument(
+        "--remote",
+        default="upstream",
+        help="Git remote to push to. Default: upstream.",
+    )
+    parser.add_argument(
+        "--yes",
+        action="store_true",
+        help="Execute the release. Default is dry-run.",
+    )
     return parser.parse_args()
 
 
@@ -173,14 +189,14 @@ def main() -> int:
 
     write_project_version(release)
     run(["uv", "sync"])
-    commit_version(release, f"Releasing v{release}", dry_run=False)
+    commit_version(f"Releasing v{release}", dry_run=False)
     run(["git", "push", args.remote, "main"])
     run(["git", "tag", "-a", tag, "-m", f"Release {tag}"])
     run(["git", "push", args.remote, tag])
 
     write_project_version(next_pre)
     run(["uv", "sync"])
-    commit_version(next_pre, f"Bump version to v{next_pre}", dry_run=False)
+    commit_version(f"Bump version to v{next_pre}", dry_run=False)
     run(["git", "push", args.remote, "main"])
 
     print(f"Released {tag}; main is now on {next_pre}.")

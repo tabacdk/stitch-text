@@ -115,7 +115,10 @@ def save_svg(
     height = pattern.height * cell_size
     parts = [
         '<?xml version="1.0" encoding="UTF-8"?>',
-        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}">',
+        (
+            f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" '
+            f'viewBox="0 0 {width} {height}">'
+        ),
         '<rect width="100%" height="100%" fill="white"/>',
     ]
     fills = {1: "#aaaaaa", 2: "#191919"}
@@ -187,7 +190,9 @@ def pdf_tile_capacity(
     cell = stitch_mm(count) * mm
     margin = stitch_aligned_margin_mm(margin_mm, count) * mm
     available_width = page_width - 2 * margin
-    available_height = page_height - 2 * margin - headline_height_mm * mm - headline_gap_stitches * cell
+    available_height = (
+        page_height - 2 * margin - headline_height_mm * mm - headline_gap_stitches * cell
+    )
     width = math.floor(available_width / cell)
     height = math.floor(available_height / cell)
     if width < 1 or height < 1:
@@ -247,7 +252,6 @@ def _draw_pdf_overlap_markers(
     *,
     grid_left: float,
     grid_top: float,
-    grid_bottom: float,
     cell: float,
     width: int,
     height: int,
@@ -312,7 +316,11 @@ def save_pdf(
     headline_y = page_height - margin - headline_font_size
     grid_left = margin
     grid_top = headline_y - headline_gap
-    tile_width, tile_height = pdf_tile_capacity(count=count, margin_mm=margin_mm, paper_size=paper_size)
+    tile_width, tile_height = pdf_tile_capacity(
+        count=count,
+        margin_mm=margin_mm,
+        paper_size=paper_size,
+    )
     x_starts = pdf_tile_starts(pattern.width, tile_width, page_overlap)
     y_starts = pdf_tile_starts(pattern.height, tile_height, page_overlap)
 
@@ -337,7 +345,6 @@ def save_pdf(
                     pdf,
                     grid_left=grid_left,
                     grid_top=grid_top,
-                    grid_bottom=grid_bottom,
                     cell=cell,
                     width=width,
                     height=height,
@@ -368,15 +375,11 @@ def save_pdf(
             if show_grid:
                 pdf.setLineWidth(0.25)
                 for global_x in range(x_start, x_end + 1):
-                    pdf.setStrokeColor(
-                        _SVG_GRID_ACCENT if global_x % 10 == 0 else _SVG_GRID_LIGHT
-                    )
+                    pdf.setStrokeColor(_SVG_GRID_ACCENT if global_x % 10 == 0 else _SVG_GRID_LIGHT)
                     xx = grid_left + (global_x - x_start) * cell
                     pdf.line(xx, grid_bottom, xx, grid_top)
                 for global_y in range(y_start, y_end + 1):
-                    pdf.setStrokeColor(
-                        _SVG_GRID_ACCENT if global_y % 10 == 0 else _SVG_GRID_LIGHT
-                    )
+                    pdf.setStrokeColor(_SVG_GRID_ACCENT if global_y % 10 == 0 else _SVG_GRID_LIGHT)
                     yy = grid_top - (global_y - y_start) * cell
                     pdf.line(grid_left, yy, grid_left + width * cell, yy)
 

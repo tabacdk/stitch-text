@@ -16,7 +16,7 @@ dependencies = [
 stch_txt = "stitch_text.cli:main"
 
 [build-system]
-requires = ["uv_build>=0.9.8,<0.10.0"]
+requires = ["uv_build>=0.9.8,<0.12.0"]
 build-backend = "uv_build"
 
 [tool.pytest.ini_options]
@@ -24,6 +24,41 @@ pythonpath = ["src"]
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "A",
+    "ARG",
+    "B",
+    "C4",
+    "COM",
+    "E",
+    "EXE",
+    "F",
+    "FA",
+    "I",
+    "ICN",
+    "ISC",
+    "N",
+    "PERF",
+    "PIE",
+    "PLC",
+    "PLE",
+    "PLW",
+    "PT",
+    "PTH",
+    "RET",
+    "RUF",
+    "SIM",
+    "TID",
+    "UP",
+    "W",
+    "YTT",
+]
+ignore = [
+    "COM812",
+    "ISC001",
+]
 
 [tool.uv.build-backend]
 source-include = ["local-example.toml"]

@@ -39,7 +39,7 @@ def test_pdf_tile_starts_include_overlap() -> None:
 
 
 def test_pdf_tile_overlap_must_be_smaller_than_capacity() -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="overlap must be smaller"):
         pdf_tile_starts(total=200, capacity=3, overlap=3)
 
 
