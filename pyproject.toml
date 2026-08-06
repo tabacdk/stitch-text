@@ -7,7 +7,10 @@ authors = [
     { name = "Thomas Ammitzbøll-Bach", email = "tab@uu.dk" }
 ]
 requires-python = ">=3.14"
-dependencies = ["Pillow>=8.0"]
+dependencies = [
+    "Pillow>=8.0",
+    "reportlab>=5.0.0",
+]
 
 [project.scripts]
 stch_txt = "stitch_text.cli:main"

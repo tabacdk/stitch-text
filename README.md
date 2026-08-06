@@ -12,6 +12,8 @@ Input line breaks are authoritative. The renderer does not wrap, reflow, hyphena
 
 Line and paragraph spacing are fixed whole-stitch counts calculated once at the start of a run. With the default `--l-height 12`, baseline-to-baseline line spacing is 18 stitches. `--line-height` scales that spacing. `--paragraph-height` is relative to the effective line height and is used for empty input lines, so the default paragraph distance is 27 stitches.
 
+PDF output uses fabric count for physical scale. The default is 14-count, meaning 14 stitches per inch. The renderer never autoscales to fit the page. Large patterns are split across as many pages as needed in both directions, with a 4-stitch overlap by default. Page joins are marked with small filled triangles in the margin, positioned to overlap when adjacent pages are taped together. PNG, SVG, and PDF grids accent every 10 stitches with a darker grid line.
+
 ## Install
 
 ```bash
@@ -32,6 +34,7 @@ stch_txt "Korssting" --output sample.png
 stch_txt "Dejavu" --format text
 stch_txt --file input.txt --output sample.svg
 stch_txt --file poem.txt --center --line-height 1.1 --paragraph-height 1.5 --output poem.svg
+stch_txt --file chart.txt --headline "Linda" --format pdf --output linda.pdf
 ```
 
 Useful options:
@@ -47,6 +50,12 @@ Useful options:
 -c, --center
 -L, --line-height 1.0
 -P, --paragraph-height 1.5
+--headline "Title"
+--count 14
+--margin-mm 15
+--letter-size
+--page-overlap 4
+--no-overlap-mark
 ```
 
 More phase steps can reduce half-tones, at the cost of a little more work.

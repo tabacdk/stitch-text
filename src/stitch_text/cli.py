@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 
 from .core import Rasterizer
-from .output import save_png, save_svg, save_text
+from .output import save_pdf, save_png, save_svg, save_text
 
 FONT_CANDIDATES = (
     Path("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"),
@@ -34,9 +35,15 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("-c", "--center", action="store_true")
     p.add_argument("-L", "--line-height", type=float, default=1.0)
     p.add_argument("-P", "--paragraph-height", type=float, default=1.5)
-    p.add_argument("--format", choices=("png", "svg", "text"))
+    p.add_argument("--format", choices=("png", "svg", "pdf", "text"))
     p.add_argument("--output", type=Path)
     p.add_argument("--cell-size", type=int, default=24)
+    p.add_argument("--headline")
+    p.add_argument("--count", type=float, default=14.0)
+    p.add_argument("--margin-mm", type=float, default=15.0)
+    p.add_argument("--letter-size", action="store_true")
+    p.add_argument("--page-overlap", type=int, default=4)
+    p.add_argument("--no-overlap-mark", action="store_true")
     p.add_argument("--no-grid", action="store_true")
     p.add_argument("--no-baseline", action="store_true")
     return p
@@ -50,6 +57,17 @@ def input_text(args: argparse.Namespace, parser_: argparse.ArgumentParser) -> st
     if args.file is not None:
         return args.file.read_text(encoding="utf-8")
     return str(args.text)
+
+
+def headline(args: argparse.Namespace, text: str) -> str:
+    if args.headline:
+        return str(args.headline)
+    if args.file is not None:
+        return args.file.stem
+    words = re.findall(r"\S+", text)
+    if len(words) <= 3:
+        return " ".join(words)
+    return f"{' '.join(words[:3])}..."
 
 
 def main() -> int:
@@ -90,6 +108,20 @@ def main() -> int:
                 pattern,
                 output,
                 cell_size=args.cell_size,
+                show_grid=not args.no_grid,
+                show_baseline=not args.no_baseline,
+            )
+        elif fmt == "pdf":
+            paper_size = "letter" if args.letter_size else "a4"
+            save_pdf(
+                pattern,
+                output,
+                headline=headline(args, text),
+                count=args.count,
+                margin_mm=args.margin_mm,
+                paper_size=paper_size,
+                page_overlap=args.page_overlap,
+                mark_overlap=not args.no_overlap_mark,
                 show_grid=not args.no_grid,
                 show_baseline=not args.no_baseline,
             )
