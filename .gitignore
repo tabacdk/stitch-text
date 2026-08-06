@@ -10,6 +10,6 @@ wheels/
 # Virtual environments
 .venv
 
-
+artifacts/
 *.png
 *.svg
