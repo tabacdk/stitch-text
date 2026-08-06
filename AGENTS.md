@@ -42,6 +42,8 @@ Create a deterministic cross-stitch bitmap font derived from DejaVu Sans.
 - Lint: `uv run ruff check .`
 - Type-check: `uv run ty check src`
 - Run: `stch_txt "Hamburgefontsiv" --output sample.svg`
+- Release dry-run: `python3 scripts/release.py`
+- Release execute: `python3 scripts/release.py --yes`
 
 ## Coding style
 - Python 3.10+

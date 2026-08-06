@@ -101,3 +101,18 @@ uv run pytest
 uv run ruff check .
 uv run ty check src
 ```
+
+## Release
+
+Releases are made from a clean `main` checkout with:
+
+```bash
+python3 scripts/release.py
+python3 scripts/release.py --yes
+```
+
+The first command is a dry-run. The release script allows ignored local artifacts such as `dist/`,
+`artifacts/`, caches, PNGs, and SVGs, but aborts on tracked changes or non-ignored untracked files.
+It removes a `-pre` suffix for the release if present, runs `uv sync`, commits the release version,
+pushes `main`, creates and pushes the annotated `vX.Y.Z` tag, then bumps `main` to the next
+`X.Y.(Z+1)-pre` development version.
