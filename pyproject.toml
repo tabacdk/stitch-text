@@ -1,6 +1,6 @@
 [project]
 name = "stitch-text"
-version = "0.1.1"
+version = "0.1.2"
 description = "Convert DejaVu Sans glyphs into deterministic three-level cross-stitch patterns."
 readme = "README.md"
 authors = [
