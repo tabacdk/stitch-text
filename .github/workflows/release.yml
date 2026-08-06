@@ -43,11 +43,16 @@ jobs:
       - name: Run type check
         run: uv run ty check src
 
+      - name: Clean distribution directory
+        run: rm -rf dist
+
       - name: Build distributions
         run: uv build
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/*
+          files: |
+            dist/*.tar.gz
+            dist/*.whl
           tag_name: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
