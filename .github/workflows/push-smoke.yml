@@ -1,0 +1,14 @@
+name: Push Smoke
+
+on:
+  push:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show trigger context
+        run: |
+          echo "event=$GITHUB_EVENT_NAME"
+          echo "ref=$GITHUB_REF"
+          echo "sha=$GITHUB_SHA"
