@@ -33,6 +33,8 @@ Create a deterministic cross-stitch bitmap font derived from DejaVu Sans.
   third-last and second-last columns on the left page, and between the second and third columns on
   the right page, so they overlap when pages are taped together.
 - PNG, SVG, and PDF grids use a darker, not wider, accent line every 10 stitches.
+- Default options live in the packaged `stitch_text/defaults.toml` asset. `--config-file` loads
+  a partial local TOML override. Precedence is packaged defaults, local config, explicit CLI.
 
 ## Commands
 - Install: `uv sync --dev`

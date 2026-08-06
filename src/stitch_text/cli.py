@@ -4,6 +4,7 @@ import argparse
 import re
 from pathlib import Path
 
+from .config import Config, load_config
 from .core import Rasterizer
 from .output import save_pdf, save_png, save_svg, save_text
 
@@ -25,27 +26,28 @@ def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Convert DejaVu Sans text to cross-stitch.")
     p.add_argument("text", nargs="?")
     p.add_argument("-f", "--file", type=Path, help="read input text from a UTF-8 text file")
+    p.add_argument("--config-file", type=Path)
     p.add_argument("--font", type=Path)
-    p.add_argument("--l-height", type=int, default=12)
-    p.add_argument("--low-threshold", type=int, default=64)
-    p.add_argument("--high-threshold", type=int, default=192)
-    p.add_argument("--phase-steps", type=int, default=8)
-    p.add_argument("--tracking", type=int, default=0)
-    p.add_argument("--padding", type=int, default=1)
-    p.add_argument("-c", "--center", action="store_true")
-    p.add_argument("-L", "--line-height", type=float, default=1.0)
-    p.add_argument("-P", "--paragraph-height", type=float, default=1.5)
+    p.add_argument("--l-height", type=int)
+    p.add_argument("--low-threshold", type=int)
+    p.add_argument("--high-threshold", type=int)
+    p.add_argument("--phase-steps", type=int)
+    p.add_argument("--tracking", type=int)
+    p.add_argument("--padding", type=int)
+    p.add_argument("-c", "--center", action="store_true", default=None)
+    p.add_argument("-L", "--line-height", type=float)
+    p.add_argument("-P", "--paragraph-height", type=float)
     p.add_argument("--format", choices=("png", "svg", "pdf", "text"))
     p.add_argument("--output", type=Path)
-    p.add_argument("--cell-size", type=int, default=24)
+    p.add_argument("--cell-size", type=int)
     p.add_argument("--headline")
-    p.add_argument("--count", type=float, default=14.0)
-    p.add_argument("--margin-mm", type=float, default=15.0)
-    p.add_argument("--letter-size", action="store_true")
-    p.add_argument("--page-overlap", type=int, default=4)
-    p.add_argument("--no-overlap-mark", action="store_true")
-    p.add_argument("--no-grid", action="store_true")
-    p.add_argument("--no-baseline", action="store_true")
+    p.add_argument("--count", type=float)
+    p.add_argument("--margin-mm", type=float)
+    p.add_argument("--letter-size", action="store_true", default=None)
+    p.add_argument("--page-overlap", type=int)
+    p.add_argument("--no-overlap-mark", action="store_false", dest="overlap_mark", default=None)
+    p.add_argument("--no-grid", action="store_false", dest="grid", default=None)
+    p.add_argument("--no-baseline", action="store_false", dest="baseline", default=None)
     return p
 
 
@@ -70,25 +72,38 @@ def headline(args: argparse.Namespace, text: str) -> str:
     return f"{' '.join(words[:3])}..."
 
 
+def config_from_args(args: argparse.Namespace) -> Config:
+    config = load_config(args.config_file)
+    overrides = {
+        key: value
+        for key, value in vars(args).items()
+        if key in Config.__dataclass_fields__ and value is not None
+    }
+    if not overrides:
+        return config
+    return Config.from_mapping({**config.__dict__, **overrides})
+
+
 def main() -> int:
     p = parser()
     args = p.parse_args()
+    config = config_from_args(args)
     text = input_text(args, p)
     font = args.font or default_font()
     rasterizer = Rasterizer(
         font,
-        l_height=args.l_height,
-        low_threshold=args.low_threshold,
-        high_threshold=args.high_threshold,
-        phase_steps=args.phase_steps,
+        l_height=config.l_height,
+        low_threshold=config.low_threshold,
+        high_threshold=config.high_threshold,
+        phase_steps=config.phase_steps,
     )
     pattern = rasterizer.render_text(
         text,
-        tracking=args.tracking,
-        padding=args.padding,
-        center=args.center,
-        line_height=args.line_height,
-        paragraph_height=args.paragraph_height,
+        tracking=config.tracking,
+        padding=config.padding,
+        center=config.center,
+        line_height=config.line_height,
+        paragraph_height=config.paragraph_height,
     )
     fmt = args.format or (args.output.suffix.lstrip(".").lower() if args.output else "text")
     if fmt == "text":
@@ -99,31 +114,31 @@ def main() -> int:
             save_png(
                 pattern,
                 output,
-                cell_size=args.cell_size,
-                show_grid=not args.no_grid,
-                show_baseline=not args.no_baseline,
+                cell_size=config.cell_size,
+                show_grid=config.grid,
+                show_baseline=config.baseline,
             )
         elif fmt == "svg":
             save_svg(
                 pattern,
                 output,
-                cell_size=args.cell_size,
-                show_grid=not args.no_grid,
-                show_baseline=not args.no_baseline,
+                cell_size=config.cell_size,
+                show_grid=config.grid,
+                show_baseline=config.baseline,
             )
         elif fmt == "pdf":
-            paper_size = "letter" if args.letter_size else "a4"
+            paper_size = "letter" if config.letter_size else "a4"
             save_pdf(
                 pattern,
                 output,
                 headline=headline(args, text),
-                count=args.count,
-                margin_mm=args.margin_mm,
+                count=config.count,
+                margin_mm=config.margin_mm,
                 paper_size=paper_size,
-                page_overlap=args.page_overlap,
-                mark_overlap=not args.no_overlap_mark,
-                show_grid=not args.no_grid,
-                show_baseline=not args.no_baseline,
+                page_overlap=config.page_overlap,
+                mark_overlap=config.overlap_mark,
+                show_grid=config.grid,
+                show_baseline=config.baseline,
             )
         else:
             raise ValueError(f"unsupported format: {fmt}")

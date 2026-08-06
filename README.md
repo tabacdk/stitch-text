@@ -26,6 +26,24 @@ On Ubuntu, DejaVu Sans is normally found at:
 /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
 ```
 
+## Why Half-Tones Help
+
+Traditional bitmap letters are built by deciding whether each square is either fully on or fully off. That works well at large sizes, but small stitched letters have very few squares to describe curves, diagonals, and thin details. A round letter like `e` or `s` can become jagged, cramped, or hard to recognize when every stitch must be completely black or completely empty.
+
+Half-tones add a middle choice. Instead of only "no stitch" and "full stitch", this project uses three levels:
+
+```text
+0 empty
+1 half-tone
+2 full
+```
+
+In cross-stitch terms, a half-tone is a lighter stitch or a visually softer mark. It lets the pattern suggest that only part of a square belongs to the letter. The grid is still made of whole stitches, but the edge of the letter can look less stair-stepped because some edge stitches are allowed to be lighter than the main body of the letter.
+
+This is similar to sketching with a light pencil before using a dark pen. The dark stitches carry the main shape. The half-tone stitches soften corners, diagonals, and curves so the eye reads the intended letter more easily.
+
+The program still keeps the pattern deterministic and simple: every cell is always one of the same three stitch levels, and the meaning of those levels never changes.
+
 ## Usage
 
 ```bash
@@ -35,6 +53,7 @@ stch_txt "Dejavu" --format text
 stch_txt --file input.txt --output sample.svg
 stch_txt --file poem.txt --center --line-height 1.1 --paragraph-height 1.5 --output poem.svg
 stch_txt --file chart.txt --headline "Linda" --format pdf --output linda.pdf
+stch_txt --config-file local.toml --file chart.txt --format pdf --output chart.pdf
 ```
 
 Useful options:
@@ -56,9 +75,24 @@ Useful options:
 --letter-size
 --page-overlap 4
 --no-overlap-mark
+--config-file local.toml
 ```
 
 More phase steps can reduce half-tones, at the cost of a little more work.
+
+## Configuration
+
+Default options live in the packaged `stitch_text/defaults.toml` asset. A local TOML file can override any subset of those values. See `local-example.toml` for a fully commented template.
+
+```toml
+count = 16
+margin_mm = 18
+page_overlap = 4
+grid = true
+baseline = true
+```
+
+Precedence is: packaged defaults, then `--config-file`, then explicit CLI options.
 
 ## Development
 

@@ -1,0 +1,77 @@
+# Example local configuration for stch_txt.
+#
+# Use it with:
+#
+#   stch_txt --config-file local.toml --file input.txt --format pdf --output output.pdf
+#
+# Copy this file to your own local config and uncomment only the values you want to change.
+# Any field left out inherits from the packaged default config in src/stitch_text/defaults.toml.
+# Explicit CLI options override both the packaged defaults and the local config file.
+
+# Height, in stitches, from the top of lowercase "l" to the baseline.
+# This is the primary typographic scale for rasterizing glyphs.
+# l_height = 12
+
+# Thresholds for converting grayscale pixels to stitch levels.
+# Values below low_threshold become 0 (empty).
+# Values from low_threshold up to high_threshold become 1 (half-tone).
+# Values at or above high_threshold become 2 (full stitch).
+# Keep 0 <= low_threshold < high_threshold <= 255.
+# low_threshold = 64
+# high_threshold = 192
+
+# Number of horizontal subpixel phases tested for each glyph.
+# More steps can improve compactness or reduce half-tones, at the cost of more work.
+# The selected phase is deterministic and cached per glyph.
+# phase_steps = 8
+
+# Extra stitches added between adjacent visible glyph bounding boxes.
+# The default glyph gap is already 2 stitches; tracking is added on top of that.
+# tracking = 0
+
+# Empty stitches kept around rendered single-line patterns.
+# padding = 1
+
+# Center each rendered line within the widest line when composing multiline text.
+# Centering happens on whole-stitch coordinates only.
+# center = false
+
+# Multiplier for the default baseline-to-baseline line spacing.
+# With l_height = 12, the base line spacing is 18 stitches.
+# line_height = 1.0
+
+# Multiplier relative to the effective line height for empty input lines.
+# With defaults, paragraph spacing is round(18 * 1.5) = 27 stitches.
+# paragraph_height = 1.5
+
+# Pixel size for PNG and SVG output cells.
+# PDF ignores this and uses count for physical scale.
+# cell_size = 24
+
+# Fabric count for PDF output: stitches per inch.
+# Default 14-count means each stitch is 25.4 / 14 mm wide.
+# count = 14.0
+
+# Requested PDF margin in millimeters.
+# The actual margin is rounded up to a whole number of stitches.
+# With 14-count and 15 mm, the actual margin is 9 stitches, about 16.3 mm.
+# margin_mm = 15.0
+
+# Use Letter paper for PDF output.
+# false means A4, which is the default.
+# letter_size = false
+
+# Number of stitches repeated between adjacent PDF pages.
+# Page join markers are placed so matching overlap grid lines align when pages are taped together.
+# page_overlap = 4
+
+# Draw small filled triangle markers in the PDF margins for page joins.
+# Set false to hide overlap/page join markers.
+# overlap_mark = true
+
+# Draw grid lines in PNG, SVG, and PDF output.
+# Every tenth grid line is darker, not wider.
+# grid = true
+
+# Draw baseline guide lines in PNG, SVG, text, and PDF output where applicable.
+# baseline = true

@@ -1,0 +1,17 @@
+l_height = 12
+low_threshold = 64
+high_threshold = 192
+phase_steps = 8
+tracking = 0
+padding = 1
+center = false
+line_height = 1.0
+paragraph_height = 1.5
+cell_size = 24
+count = 14.0
+margin_mm = 15.0
+letter_size = false
+page_overlap = 4
+overlap_mark = true
+grid = true
+baseline = true
