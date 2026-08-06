@@ -22,7 +22,8 @@ def default_font() -> Path:
 
 def parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Convert DejaVu Sans text to cross-stitch.")
-    p.add_argument("text")
+    p.add_argument("text", nargs="?")
+    p.add_argument("-f", "--file", type=Path, help="read input text from a UTF-8 text file")
     p.add_argument("--font", type=Path)
     p.add_argument("--l-height", type=int, default=12)
     p.add_argument("--low-threshold", type=int, default=64)
@@ -38,8 +39,20 @@ def parser() -> argparse.ArgumentParser:
     return p
 
 
+def input_text(args: argparse.Namespace, parser_: argparse.ArgumentParser) -> str:
+    if args.text is not None and args.file is not None:
+        parser_.error("provide either text or --file, not both")
+    if args.text is None and args.file is None:
+        parser_.error("provide text or --file")
+    if args.file is not None:
+        return args.file.read_text(encoding="utf-8")
+    return str(args.text)
+
+
 def main() -> int:
-    args = parser().parse_args()
+    p = parser()
+    args = p.parse_args()
+    text = input_text(args, p)
     font = args.font or default_font()
     rasterizer = Rasterizer(
         font,
@@ -48,7 +61,7 @@ def main() -> int:
         high_threshold=args.high_threshold,
         phase_steps=args.phase_steps,
     )
-    pattern = rasterizer.render(args.text, tracking=args.tracking, padding=args.padding)
+    pattern = rasterizer.render(text, tracking=args.tracking, padding=args.padding)
     fmt = args.format or (args.output.suffix.lstrip(".").lower() if args.output else "text")
     if fmt == "text":
         save_text(pattern, args.output)

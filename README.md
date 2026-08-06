@@ -26,6 +26,7 @@ On Ubuntu, DejaVu Sans is normally found at:
 stch_txt "Hamburgefontsiv" --output sample.svg
 stch_txt "Korssting" --output sample.png
 stch_txt "Dejavu" --format text
+stch_txt --file input.txt --output sample.svg
 ```
 
 Useful options:
@@ -37,6 +38,7 @@ Useful options:
 --high-threshold 192
 --tracking 0
 --padding 1
+-f, --file input.txt
 ```
 
 More phase steps can reduce half-tones, at the cost of a little more work.
