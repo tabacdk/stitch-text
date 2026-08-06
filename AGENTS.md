@@ -10,12 +10,20 @@ Create a deterministic cross-stitch bitmap font derived from DejaVu Sans.
 - Glyph placement is on whole-stitch coordinates.
 - Minimize half-tone stitches by trying horizontal subpixel phases per glyph.
 - The chosen phase is deterministic and cached per glyph.
+- Phase selection first minimizes the visible stitch bounding-box area, then bounding-box width,
+  then half-tone stitches.
 - Preserve descenders below the baseline.
 - Keep compatibility with old Pillow versions that lack `Image.Resampling`.
+- Each visible glyph is rendered to its own tight stitch bounding box. Adjacent glyph bounding
+  boxes inside a word are separated by exactly 2 stitches by default. A space character advances
+  by exactly 7 stitches.
 - Input line breaks are authoritative. Do not wrap, reflow, hyphenate, paginate, or resize text
   to fit a target width.
 - Multiline output is composed from independently rendered single-line patterns.
 - Centering is done only on whole-stitch grid coordinates after each line has been rendered.
+- Line and paragraph spacing are calculated once at the start of a run as whole-stitch counts.
+  Default baseline-to-baseline line spacing is 18 stitches when `--l-height` is 12. `--line-height`
+  scales that spacing; `--paragraph-height` scales the effective line height.
 
 ## Commands
 - Install: `uv sync --dev`
@@ -32,11 +40,11 @@ Create a deterministic cross-stitch bitmap font derived from DejaVu Sans.
 
 
 ## Roadmap
-1. Add an `-f/--file` switch to read input from a text file rather than from commandline
-2. Support multiline text by composing independently rendered lines. Add `-c/--center` for
+1. [x] Add an `-f/--file` switch to read input from a text file rather than from commandline
+2. [x] Support multiline text by composing independently rendered lines. Add `-c/--center` for
    centered justification on whole-stitch coordinates (left justified is default). Do not add
-   automatic line wrapping.
-3. Support PDF output. Add `--A4` and `--letter-size` for paper size conformity, default A4
-4. Batch mode. Add `--source-dir`, `--dest-dir`, and `--config-file` switches
-5. Add command `stch_gui` for `tkinter`-based GUI tool.
+   automatic line wrapping. Add `-L/--line-height` and `-P/--paragraph-height`.
+3. [ ] Support PDF output. Add `--A4` and `--letter-size` for paper size conformity, default A4
+4. [ ] Batch mode. Add `--source-dir`, `--dest-dir`, and `--config-file` switches
+5. [ ] Add command `stch_gui` for `tkinter`-based GUI tool.
 6. Improve README.md

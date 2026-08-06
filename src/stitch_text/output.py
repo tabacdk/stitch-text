@@ -10,8 +10,9 @@ from .core import Pattern
 def save_text(pattern: Pattern, output: Path | None = None) -> None:
     chars = {0: "·", 1: "▒", 2: "█"}
     lines = []
+    baseline_rows = set(pattern.baseline_rows)
     for y, row in enumerate(pattern.grid):
-        prefix = "─" if y == pattern.baseline_row else " "
+        prefix = "─" if y in baseline_rows else " "
         lines.append(prefix + "".join(chars[value] for value in row))
     content = "\n".join(lines) + "\n"
     if output is None:
@@ -55,8 +56,9 @@ def save_png(
             yy = y * cell_size
             draw.line((0, yy, pattern.width * cell_size, yy), fill=(210, 210, 210))
     if show_baseline:
-        yy = pattern.baseline_row * cell_size
-        draw.line((0, yy, pattern.width * cell_size, yy), fill=(220, 40, 40), width=2)
+        for baseline_row in pattern.baseline_rows:
+            yy = baseline_row * cell_size
+            draw.line((0, yy, pattern.width * cell_size, yy), fill=(220, 40, 40), width=2)
     image.save(output)
 
 
@@ -91,9 +93,11 @@ def save_svg(
             yy = y * cell_size
             parts.append(f'<line x1="0" y1="{yy}" x2="{width}" y2="{yy}" stroke="#d2d2d2"/>')
     if show_baseline:
-        yy = pattern.baseline_row * cell_size
-        parts.append(
-            f'<line x1="0" y1="{yy}" x2="{width}" y2="{yy}" stroke="#dc2828" stroke-width="2"/>'
-        )
+        for baseline_row in pattern.baseline_rows:
+            yy = baseline_row * cell_size
+            parts.append(
+                f'<line x1="0" y1="{yy}" x2="{width}" y2="{yy}" '
+                'stroke="#dc2828" stroke-width="2"/>'
+            )
     parts.append("</svg>")
     output.write_text("\n".join(parts), encoding="utf-8")

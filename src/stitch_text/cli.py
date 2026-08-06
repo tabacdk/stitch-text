@@ -31,6 +31,9 @@ def parser() -> argparse.ArgumentParser:
     p.add_argument("--phase-steps", type=int, default=8)
     p.add_argument("--tracking", type=int, default=0)
     p.add_argument("--padding", type=int, default=1)
+    p.add_argument("-c", "--center", action="store_true")
+    p.add_argument("-L", "--line-height", type=float, default=1.0)
+    p.add_argument("-P", "--paragraph-height", type=float, default=1.5)
     p.add_argument("--format", choices=("png", "svg", "text"))
     p.add_argument("--output", type=Path)
     p.add_argument("--cell-size", type=int, default=24)
@@ -61,7 +64,14 @@ def main() -> int:
         high_threshold=args.high_threshold,
         phase_steps=args.phase_steps,
     )
-    pattern = rasterizer.render(text, tracking=args.tracking, padding=args.padding)
+    pattern = rasterizer.render_text(
+        text,
+        tracking=args.tracking,
+        padding=args.padding,
+        center=args.center,
+        line_height=args.line_height,
+        paragraph_height=args.paragraph_height,
+    )
     fmt = args.format or (args.output.suffix.lstrip(".").lower() if args.output else "text")
     if fmt == "text":
         save_text(pattern, args.output)
